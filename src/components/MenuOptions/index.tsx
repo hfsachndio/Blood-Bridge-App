@@ -14,6 +14,7 @@ const MenuOptions = ({ navigation }: any) => {
 
   const menu = [
     { title: 'My Activity & History', icon: images.dropleticon, onPress: () => navigation.navigate('AllHistoryScreen', { tab: 'donation' }) },
+    { title: 'Ask BloodBot (AI assistant)', icon: images.chaticon, onPress: () => navigation.navigate('BloodBotScreen') },
     { title: 'Log a Donation 🩸', icon: images.heartfill, onPress: () => navigation.navigate('LogDonationScreen') },
     { title: 'Update Profile & Docs', icon: images.usericon, onPress: () => navigation.navigate('ProfileBuilderScreen') },
     { title: 'Privacy & Security', icon: images.shieldicon, onPress: () => setPrivacyModalOpen(true) },

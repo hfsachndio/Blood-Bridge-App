@@ -20,6 +20,7 @@ import AdminDashboardScreen from '../screens/admin';
 import EligibilityCheckerScreen from '../screens/main/eligibilityChecker';
 import LogDonationScreen from '../screens/main/logDonation';
 import DonationCertificateScreen from '../screens/main/donationCertificate';
+import BloodBotScreen from '../screens/main/bloodBot';
 
 const Stack = createNativeStackNavigator();
 
@@ -58,6 +59,7 @@ const StackNavigator = () => {
           <Stack.Screen name="EligibilityCheckerScreen" component={EligibilityCheckerScreen} />
           <Stack.Screen name="LogDonationScreen" component={LogDonationScreen} />
           <Stack.Screen name="DonationCertificateScreen" component={DonationCertificateScreen} />
+          <Stack.Screen name="BloodBotScreen" component={BloodBotScreen} />
         </>
       ) : (
         <>

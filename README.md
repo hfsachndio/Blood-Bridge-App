@@ -1,97 +1,61 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Blood Bridge: Mobile App (with BloodBot NLP)
 
-# Getting Started
+**Blood Bridge** is a React Native and Firebase app for emergency blood donation in Karachi. It connects patients with nearby, compatible, CNIC-verified donors through SOS alerts, a donor map, chat and a points-based leaderboard.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+This repository is my copy of the team's app. My addition is **BloodBot**, an on-device NLP assistant that understands **English and Roman Urdu**.
 
-## Step 1: Start Metro
+> **Credits:** the original app was built as a team project, and I was one of the contributors. The first commit in this repository is the team's original source. Every commit after it, including the NLP assistant, is my own work.
+> Web version: **https://blood-bridge-opal.vercel.app** ([source](https://github.com/hfsachndio/blood-bridge-web))
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+![Blood Bridge screens](docs/real-screens.jpg)
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Features (team app)
 
-```sh
-# Using npm
-npm start
+- **Accounts and verification:** email sign-up and login, then a profile builder (CNIC with ML Kit text recognition, blood type, date of birth, weight). Accounts stay pending until an admin approves them.
+- **SOS requests:** post an urgent request; donors are notified (Firebase Cloud Messaging plus an in-app feed) and can respond.
+- **Search:** donation offers on Google Maps with blood-type and radius filters. Phone numbers stay hidden until the donor approves a contact request.
+- **Chat:** real-time one-to-one messaging.
+- **Donate:** post a donation offer with a location picked on the map.
+- **Leaderboard and awards:** 100 points per offer and 150 per logged donation, plus badges.
+- **Donation history, certificates and an eligibility checker** (WHO and Pakistan guidelines).
+- **Admin dashboard** for reviewing CNIC submissions.
 
-# OR using Yarn
-yarn start
+## BloodBot: NLP assistant (my addition)
+
+You can open BloodBot from the **Ask BloodBot** card on the Home screen or from **Profile → Ask BloodBot**.
+
+| Example | What happens |
+|---|---|
+| `meri ammi ko 2 bottle AB- chahiye indus hospital mein, critical` | It fills every SOS field from one sentence, asks you to confirm, then posts to Firestore and notifies compatible, available donors |
+| `send an sos` → `B+` → `Aga Khan` → `2` → `urgent` | It asks for each missing field in turn; "cancel" stops it at any point |
+| `koi O- donor hai Clifton mein?` | It lists compatible donors (exact match plus other compatible types), nearest first, with a **Chat** button |
+| `I got a tattoo 2 months ago` / `I'm 17, can I donate?` | It answers from the same eligibility rules the app uses, with the numbers from your message |
+| `show urgent requests` | It lists open requests you can donate to, with a **Respond** button |
+| `mark me unavailable` | It updates your availability in Firestore |
+
+The **NLP** switch in the header shows the detected intent, the confidence and the extracted entities for each message.
+
+### How it works
+
+Everything is plain TypeScript and runs on the device, with no external AI API and no extra dependencies.
+
+| Stage | File |
+|---|---|
+| Normalisation: Roman Urdu to English lexicon, stop-words, light stemming | `src/nlp/text.ts` |
+| Intent classification: TF-IDF over unigrams and bigrams, cosine k-NN against 250+ labelled phrases (29 intents), with a confidence threshold and an out-of-domain fallback | `src/nlp/classifier.ts` |
+| Entity recognition: blood types, typo-tolerant Karachi areas and hospitals (Levenshtein distance), units (including Urdu numbers), age, weight, time since an event, urgency | `src/nlp/entities.ts` |
+| Dialogue manager: SOS slot filling, follow-ups and actions | `src/nlp/bot.ts` |
+| Firestore data source: the same collections as the rest of the app | `src/nlp/firebaseData.ts` |
+| Chat screen | `src/screens/main/bloodBot/index.tsx` |
+
+```bash
+npm test -- src/nlp      # 7 tests: intents, entities, SOS dialogue, donor matching, eligibility
 ```
 
-## Step 2: Build and run your app
+## Running the app
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+1. `npm install`
+2. Create a Firebase project and put your own `android/app/google-services.json` in place; see `google-services.example.json`. The real config isn't committed.
+3. `npm run android` (or `npm run ios`)
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**Stack:** React Native 0.79, React 19, TypeScript, Firebase (Auth, Firestore, Storage, Messaging), React Navigation, react-native-maps and ML Kit text recognition.

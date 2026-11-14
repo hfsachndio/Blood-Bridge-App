@@ -192,6 +192,14 @@ const HomeScreen = () => {
 
       <View style={styles.mainContent}>
         <SOSSection onPressSend={openSosModal} />
+        <TouchableOpacity style={styles.botCard} activeOpacity={0.85} onPress={() => navigation.navigate('BloodBotScreen')}>
+          <Text style={styles.botEmoji}>🤖</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.botTitle}>Ask BloodBot</Text>
+            <Text style={styles.botSub}>"mujhe B+ khoon chahiye Aga Khan mein" — find donors or send an SOS by chatting.</Text>
+          </View>
+          <Text style={styles.botArrow}>›</Text>
+        </TouchableOpacity>
         <StatsSection
           totalDonations={profile?.totalDonations || 0}
           livesSaved={(profile?.totalDonations || 0) * 3}
@@ -292,6 +300,11 @@ share them with a patient.`}
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  botCard: { flexDirection: 'row', alignItems: 'center', gap: scale(12), backgroundColor: COLORS.white, borderRadius: scale(14), padding: scale(14), marginTop: verticalScale(12), borderWidth: 1, borderColor: COLORS.red100 },
+  botEmoji: { fontSize: scale(26) },
+  botTitle: { fontFamily: karma.f700, fontSize: scale(15), color: COLORS.gray900 },
+  botSub: { fontFamily: karma.f400, fontSize: scale(12), color: COLORS.slate500 },
+  botArrow: { fontSize: scale(26), color: COLORS.red600 },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

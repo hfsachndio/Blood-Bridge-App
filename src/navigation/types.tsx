@@ -12,6 +12,7 @@ export type RootStackParamList = {
   BottomTabs: undefined
   MessageScreen: undefined
   NotificationScreen: undefined
+  BloodBotScreen: undefined
   LocationPickerScreen: {
     from: 'Donate' | 'Search';
     latitude?: number;

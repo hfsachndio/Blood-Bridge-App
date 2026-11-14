@@ -214,3 +214,13 @@ export const checkEligibility = (input: EligibilityInput): EligibilityResult => 
         reasons: [],
     };
 };
+
+export const RULES = { MIN_AGE, MAX_AGE, MIN_WEIGHT_KG, MIN_DAYS_BETWEEN_DONATIONS };
+
+/** Days until the donor can give again after a donation on `last` (0 = can donate now). */
+export function daysUntilNextDonation(last?: string): number {
+    const d = last ? parseDate(last) : null;
+    if (!d) return 0;
+    const since = Math.floor((Date.now() - d.getTime()) / 86400000);
+    return Math.max(0, MIN_DAYS_BETWEEN_DONATIONS - since);
+}
