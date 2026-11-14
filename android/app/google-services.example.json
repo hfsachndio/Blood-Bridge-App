@@ -1,0 +1,6 @@
+{
+  "_comment": "Replace this file with your own google-services.json from the Firebase console (Project settings > Your apps > Android). Do not commit the real file.",
+  "project_info": { "project_number": "YOUR_PROJECT_NUMBER", "project_id": "your-project-id", "storage_bucket": "your-project-id.appspot.com" },
+  "client": [ { "client_info": { "mobilesdk_app_id": "YOUR_APP_ID", "android_client_info": { "package_name": "com.bloodbridge" } }, "api_key": [ { "current_key": "YOUR_FIREBASE_API_KEY" } ] } ],
+  "configuration_version": "1"
+}
