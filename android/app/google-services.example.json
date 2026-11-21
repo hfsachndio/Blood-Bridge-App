@@ -1,6 +1,6 @@
 {
-  "_comment": "Replace this file with your own google-services.json from the Firebase console (Project settings > Your apps > Android). Do not commit the real file.",
-  "project_info": { "project_number": "YOUR_PROJECT_NUMBER", "project_id": "your-project-id", "storage_bucket": "your-project-id.appspot.com" },
-  "client": [ { "client_info": { "mobilesdk_app_id": "YOUR_APP_ID", "android_client_info": { "package_name": "com.bloodbridge" } }, "api_key": [ { "current_key": "YOUR_FIREBASE_API_KEY" } ] } ],
+  "_comment": "Shared Blood Bridge Firebase project (also used by the website). Copy to google-services.json, or download the real file from Firebase console > Project settings > Your apps > Android (com.bloodbridge), which carries the Android API key.",
+  "project_info": { "project_number": "56833967390", "project_id": "blood-bridge-78f97", "storage_bucket": "blood-bridge-78f97.firebasestorage.app" },
+  "client": [ { "client_info": { "mobilesdk_app_id": "1:56833967390:android:dd68061b153f953c1af50f", "android_client_info": { "package_name": "com.bloodbridge" } }, "oauth_client": [], "api_key": [ { "current_key": "AIzaSyB1wLqhie7e-YV69z_gnWyWHlFu6vuq2J0" } ], "services": { "appinvite_service": { "other_platform_oauth_client": [] } } } ],
   "configuration_version": "1"
 }
