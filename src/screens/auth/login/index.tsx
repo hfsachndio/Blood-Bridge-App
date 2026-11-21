@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, StatusBar, BackHandler } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, StatusBar, BackHandler, Platform } from 'react-native';
 import { getAuth, signInWithEmailAndPassword, getDoc, doc, db, signOut } from '../../../config/firebase';
 import Toast from 'react-native-toast-message';
 import { COLORS } from '../../../utils/color';
@@ -27,6 +27,7 @@ const LoginScreen = ({ route, navigation }: any) => {
       return false;
     };
 
+    if (Platform.OS === 'web') return; // no hardware back button in the browser
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',
       backAction,
