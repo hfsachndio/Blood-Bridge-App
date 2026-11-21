@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://blood-bridge-app-nine.vercel.app/sitemap.xml
