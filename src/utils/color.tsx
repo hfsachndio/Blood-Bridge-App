@@ -6,6 +6,7 @@ export const COLORS = {
     red400: '#f87171',
     red500: '#EF4444',
     red600: '#dc2626',  
+    slate400: '#94a3b8',
     slate500: '#6b7280',
     slate600: '#4b5563',
     gray300: '#d1d5db',

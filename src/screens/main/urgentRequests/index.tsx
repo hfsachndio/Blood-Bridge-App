@@ -257,6 +257,11 @@ const UrgentRequestsScreen = () => {
             <Text style={styles.meta}>
               Units needed: {req.unitsNeeded} • {req.time}
             </Text>
+            {Array.isArray(req.aiRanking) && req.aiRanking.some((d: any) => d.uid === authUser?.uid) && (
+              <Text style={styles.aiMatch}>
+                🤖 The AI ranked you a top match for this request ({Math.round((req.aiRanking.find((d: any) => d.uid === authUser?.uid)?.p ?? 0) * 100)}% likely to respond)
+              </Text>
+            )}
 
             <TouchableOpacity style={styles.respondBtn} onPress={() => onRespond(req)}>
               <Text style={styles.respondText}>Respond</Text>
@@ -362,6 +367,7 @@ const UrgentRequestsScreen = () => {
 export default UrgentRequestsScreen;
 
 const styles = StyleSheet.create({
+  aiMatch: { fontSize: 12, color: '#7c3aed', fontWeight: '600', marginTop: 6 },
   container: {
     flex: 1,
     backgroundColor: COLORS.background,

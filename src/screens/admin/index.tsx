@@ -7,27 +7,9 @@ import { karma } from '../../assets/fonts/fonts';
 import { db, collection, query, where, onSnapshot, doc, updateDoc, getAuth, signOut } from '../../config/firebase';
 import Button from '../../components/Button';
 import Toast from 'react-native-toast-message';
-import { getApp } from '@react-native-firebase/app';
-import TextRecognition from '@react-native-ml-kit/text-recognition';
-import RNFS from 'react-native-fs';
+import { readCnicFromDataUri } from '../../ai/cnicReader';
 
-// ── OCR via ML Kit (on-device, free, no billing needed) ──────────────────────
-const extractTextFromImageUri = async (imageUri: string): Promise<string> => {
-    const result = await TextRecognition.recognize(imageUri);
-    const fullText = result.text || '';
-    console.log('[Admin OCR] text length:', fullText.length, '| preview:', fullText.slice(0, 200));
-    return fullText.toUpperCase();
-};
-
-// Convert stored base64 data URI → temp file → run OCR
-const extractTextFromDataUri = async (dataUri: string): Promise<string> => {
-    const base64 = dataUri.includes(',') ? dataUri.split(',')[1] : dataUri;
-    const tempPath = `${RNFS.CachesDirectoryPath}/cnic_temp_${Date.now()}.jpg`;
-    await RNFS.writeFile(tempPath, base64, 'base64');
-    const text = await extractTextFromImageUri(`file://${tempPath}`);
-    await RNFS.unlink(tempPath).catch(() => {});
-    return text;
-};
+// CNIC re-verification uses the shared AI reader (src/ai/cnicReader*.ts).
 
 const verifyCnicFromOcr = (ocrText: string, fullName: string, cnicNumber: string): boolean => {
     const normalized = ocrText.replace(/[\r\n]+/g, ' ').replace(/\s+/g, ' ').trim().toUpperCase();
@@ -58,7 +40,7 @@ const AdminDashboardScreen = () => {
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetchedUsers = snapshot.docs.map(userDoc => ({ id: userDoc.id, ...userDoc.data() }));
+            const fetchedUsers = snapshot.docs.map((userDoc: any) => ({ id: userDoc.id, ...userDoc.data() }));
             setUsers(fetchedUsers);
         }, (error) => {
             console.log('Error fetching users:', error);
@@ -97,15 +79,15 @@ const AdminDashboardScreen = () => {
         try {
             // Extract base64 from stored data URI
             const dataUri: string = item.documents[0];
-            const base64 = dataUri.includes(',') ? dataUri.split(',')[1] : dataUri;
-
-            const ocrText = await extractTextFromDataUri(dataUri);
+            const read = await readCnicFromDataUri(dataUri, item.cnicNumber);
+            const ocrText = read.text.toUpperCase();
             const verified = verifyCnicFromOcr(ocrText, item.fullName, item.cnicNumber);
 
             await updateDoc(doc(db, 'users', item.id), {
                 cnicVerified: verified,
                 status: verified ? 'approved' : 'pending',
                 ocrExtractedText: ocrText.slice(0, 500),
+                cnicCheck: { cnic: read.cnic, matchesTyped: read.matchesTyped, confidence: read.confidence, qualityOk: read.quality.ok, issues: read.quality.issues, dateOfBirth: read.dateOfBirth, checkedAt: new Date().toISOString() },
             });
 
             Toast.show({
@@ -150,6 +132,13 @@ const AdminDashboardScreen = () => {
                     <Text style={styles.cnicText}>CNIC: {item.cnicNumber}</Text>
                 ) : null}
                 <Text style={styles.userStatus}>Status: {item.status}</Text>
+                {item.cnicCheck ? (
+                    <Text style={styles.aiCheck}>
+                        🤖 AI check: {item.cnicCheck.cnic ? `read ${item.cnicCheck.cnic}` : 'number not found'}
+                        {item.cnicCheck.matchesTyped === true ? ' · matches' : item.cnicCheck.matchesTyped === false ? ' · does NOT match' : ''}
+                        {item.cnicCheck.qualityOk === false ? ` · ${item.cnicCheck.issues?.join(', ')}` : ' · photo OK'}
+                    </Text>
+                ) : null}
             </View>
 
             {item.documents && item.documents.length > 0 && (
@@ -270,6 +259,7 @@ const AdminDashboardScreen = () => {
 export default AdminDashboardScreen;
 
 const styles = StyleSheet.create({
+    aiCheck: { fontSize: scale(11), color: '#7c3aed', marginTop: verticalScale(4) },
     container: { flex: 1, backgroundColor: '#f3f4f6' },
     header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: scale(20), backgroundColor: COLORS.white },
     headerTitle: { fontSize: scale(20), fontFamily: karma.f700, color: COLORS.gray900 },

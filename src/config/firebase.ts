@@ -1,5 +1,7 @@
 /**
  * Centralized Firebase Configuration — Modular API (v23+)
+ * Project: blood-bridge-78f97, shared with the Blood Bridge website (same Auth users + Firestore).
+ * The web build of the app uses firebase.web.ts (Firebase JS SDK) with the same exports.
  * All exports use the modular SDK to avoid deprecation warnings.
  */
 
@@ -16,16 +18,6 @@ import {
   signOut,
   onAuthStateChanged,
 } from '@react-native-firebase/auth';
-
-// ── Storage (modular) ───────────────────────────────────────────────────────
-import {
-  getStorage as _getStorage,
-  ref,
-  putFile,
-  uploadString,
-  uploadBytes,
-  getDownloadURL,
-} from '@react-native-firebase/storage';
 
 // ── Firestore (modular) ─────────────────────────────────────────────────────
 import {
@@ -52,13 +44,10 @@ import {
 // ── Initialise ──────────────────────────────────────────────────────────────
 const app = getApp();
 const db = _getFirestore(app);
-// Explicitly declare the bucket with the legacy .appspot.com domain! 
-// This fixes the 'object-not-found' bug when uploading in RN Firebase with new Firebase projects!
-const storage = _getStorage(app, 'gs://bloodbridge-b2f0a.appspot.com');
+// No Cloud Storage: CNIC photos are compressed and kept in the user document (free Spark plan).
 
 // ── Auth helpers ─────────────────────────────────────────────────────────────
 export const getAuth = () => _getAuth(app);
-export const getStorage = () => storage;
 
 export {
   signInWithEmailAndPassword,
@@ -111,9 +100,4 @@ export {
   arrayRemove,
   increment,
   db,
-  ref,
-  putFile,
-  uploadString,
-  uploadBytes,
-  getDownloadURL,
 };

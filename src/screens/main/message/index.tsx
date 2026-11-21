@@ -157,14 +157,8 @@ const MessageScreen = ({ route, navigation }: any) => {
     const msgsRef = collection(db, 'chats', chatId, 'messages');
 
     try {
-      // Write the message to the subcollection
-      await addDoc(msgsRef, {
-        senderId: authUser.uid,
-        text: trimmed,
-        createdAt: now,
-      });
-
-      // Update conversation metadata (for the ChatScreen list)
+      // Create / update the conversation first: the security rules check that the sender
+      // is a participant of this chat before a message can be added.
       await setDoc(
         chatDocRef,
         {
@@ -179,6 +173,13 @@ const MessageScreen = ({ route, navigation }: any) => {
         },
         { merge: true },
       );
+
+      // Write the message to the subcollection
+      await addDoc(msgsRef, {
+        senderId: authUser.uid,
+        text: trimmed,
+        createdAt: now,
+      });
 
       // ── Send in-app notification to recipient ─────────────────────────
       try {

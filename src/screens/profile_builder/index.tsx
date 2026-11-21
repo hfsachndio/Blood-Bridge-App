@@ -9,17 +9,12 @@ import { useUser } from '../../context/UserContext';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { doc, setDoc, db } from '../../config/firebase';
 import Toast from 'react-native-toast-message';
-import TextRecognition from '@react-native-ml-kit/text-recognition';
+import { readCnic } from '../../ai/cnicReader';
+import type { CnicReading } from '../../ai/cnicText';
 import { navigationRef } from '../../../App';
 
-// ── OCR via ML Kit (on-device, free, no billing needed) ──────────────────────
-const extractTextFromImageUri = async (imageUri: string): Promise<string> => {
-    const result = await TextRecognition.recognize(imageUri);
-    const fullText = result.text || '';
-    console.log('[OCR] Extracted text length:', fullText.length);
-    console.log('[OCR] Extracted text:', fullText.slice(0, 400));
-    return fullText.toUpperCase();
-};
+// ── AI CNIC reader: ML Kit OCR on phones, quality check + Tesseract OCR on the web build ─────
+// (src/ai/cnicReader.ts / cnicReader.web.ts — same parser and checks as the website)
 
 // ── Match name and CNIC/Identity number from OCR text ────────────────────────
 const verifyCnicFromOcr = (ocrText: string, fullName: string, cnicNumber: string): boolean => {
@@ -97,8 +92,17 @@ const ProfileBuilderScreen = ({ navigation }: any) => {
             let ocrText = '';
             let cnicVerified = false;
 
+            let read: CnicReading | null = null;
             try {
-                ocrText = await extractTextFromImageUri(documentImage.uri);
+                read = await readCnic(documentImage.uri, profile.cnicNumber || undefined);
+                ocrText = read.text.toUpperCase();
+                if (!read.quality.ok) {
+                    // Photo-quality check failed: ask for a better photo instead of sending a bad one to review.
+                    setVerifyingOcr(false);
+                    setLoading(false);
+                    Alert.alert('Retake your CNIC photo', read.quality.issues.join('\n') + '\n\nUse good light, keep the card flat and fill the frame.');
+                    return;
+                }
                 cnicVerified = verifyCnicFromOcr(
                     ocrText,
                     profile.fullName || '',
@@ -118,6 +122,8 @@ const ProfileBuilderScreen = ({ navigation }: any) => {
                 documents: [dataUri],
                 cnicVerified,
                 ocrExtractedText: ocrText.slice(0, 500), // store first 500 chars for admin audit
+                // Result of the AI CNIC check, shown to the admin (same shape as the website).
+                ...(read ? { cnicCheck: { cnic: read.cnic, matchesTyped: read.matchesTyped, confidence: read.confidence, qualityOk: read.quality.ok, issues: read.quality.issues, dateOfBirth: read.dateOfBirth, checkedAt: new Date().toISOString() } } : {}),
                 updatedAt: new Date().toISOString(),
             }, { merge: true });
 

@@ -1,8 +1,7 @@
 /**
  * Config exports - use for cleaner imports
- * import { auth, firestore } from '../config';
+ * import { getAuth, db } from '../config';
  */
 export * from './firebase';
-export { default as firebase } from './firebase';
 
 

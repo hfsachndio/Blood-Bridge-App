@@ -94,7 +94,7 @@ const Header = ({ hasUnreadNotifications = false }: HeaderProps) => {
             <Text style={styles.username}>{userName}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.bellButton} onPress={() => navigation.navigate('NotificationScreen')}>
+        <TouchableOpacity style={styles.bellButton} onPress={() => (navigation as any).navigate('NotificationScreen')}>
           <Image
             source={images.bellicon}
             resizeMode="contain"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { auth } from '../../../config/firebase';
+import { getAuth, sendPasswordResetEmail } from '../../../config/firebase';
 import Toast from 'react-native-toast-message';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, StatusBar } from 'react-native';
 import { COLORS } from '../../../utils/color';
@@ -39,7 +39,7 @@ const ForgetPasswordScreen = ({ navigation }: any) => {
     }
 
     try {
-      await auth().sendPasswordResetEmail(email);
+      await sendPasswordResetEmail(getAuth(), email);
       Toast.show({
         type: 'success',
         text1: 'Email Sent Successfully!',

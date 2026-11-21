@@ -15,6 +15,7 @@ import { COLORS } from '../../../utils/color';
 import { karma } from '../../../assets/fonts/fonts';
 import { scale, verticalScale } from '../../../utils/globalFunction';
 import DonorCard from '../../../components/DonarCard';
+import { donorInputFor, locate, responseProbability } from '../../../ai/donorRank';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import InputField from '../../../components/InputField';
 import { images } from '../../../assets/png/images';
@@ -60,6 +61,8 @@ interface Donor {
   donationCount: number;
   privacyMasked: boolean;
   phone?: string;
+  /** AI donor-response probability (0–1). */
+  aiScore?: number;
 }
 
 const BLOOD_TYPES = ['all', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
@@ -82,6 +85,7 @@ const SearchScreen = () => {
   const { authUser, profile } = useUser();
 
   const [bloodTypeFilter, setBloodTypeFilter] = useState<string>('all');
+  const [sortMode, setSortMode] = useState<'ai' | 'near'>('ai');
   const [searchQuery, setSearchQuery] = useState('');
   const [showBloodTypes, setShowBloodTypes] = useState(false);
   const [unmaskRequests, setUnmaskRequests] = useState<Set<string>>(new Set());
@@ -273,7 +277,19 @@ const SearchScreen = () => {
           ? true
           : (!!d.coords?.latitude && (d as any)._dist <= activeRadius);
       return matchBlood && matchText && withinRadius;
-    });
+    })
+    .map(d => {
+      // Score each donor with the donor-response neural network (same model as the website).
+      const here = centerCoords ? { lat: centerCoords.latitude, lng: centerCoords.longitude } : undefined;
+      const there = d.coords?.latitude ? { lat: d.coords.latitude, lng: d.coords.longitude } : locate(d.location);
+      const km = (d as any)._dist ?? (here && there ? haversine(here.lat, here.lng, there.lat, there.lng) : 8);
+      const p = responseProbability(donorInputFor(
+        { uid: d.uid, bloodType: d.bloodType, totalDonations: d.donationCount, createdAt: new Date(Date.now() - 180 * 864e5).toISOString() },
+        { km, neededType: bloodTypeFilter === 'all' ? undefined : bloodTypeFilter, urgent: false, responsesByUid: new Map() },
+      ));
+      return { ...d, aiScore: p };
+    })
+    .sort((a, b) => sortMode === 'ai' ? (b.aiScore ?? 0) - (a.aiScore ?? 0) : ((a as any)._dist ?? 99) - ((b as any)._dist ?? 99));
 
   // ── Animated filter pill ─────────────────────────────────────────────────
   const pillScale = filterAnim.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] });
@@ -402,6 +418,9 @@ const SearchScreen = () => {
                   {' '}donor{filteredDonors.length !== 1 ? 's' : ''} found
                   {centerCoords ? ` within ~${activeRadius} km` : ''}
                 </Text>
+                <TouchableOpacity onPress={() => setSortMode(m => (m === 'ai' ? 'near' : 'ai'))} style={styles.refreshBtn} accessibilityLabel="Change sort order">
+                  <Text style={styles.refreshBtnText}>{sortMode === 'ai' ? '🤖 AI: most likely to respond' : '📍 Nearest first'}</Text>
+                </TouchableOpacity>
                 <TouchableOpacity onPress={onRefresh} style={styles.refreshBtn}>
                   <Text style={styles.refreshBtnText}>↻  Refresh</Text>
                 </TouchableOpacity>

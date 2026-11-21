@@ -13,6 +13,7 @@ import CustomModal from '../../../components/CustomModal';
 import InputField from '../../../components/InputField';
 import Button from '../../../components/Button';
 import Toast from 'react-native-toast-message';
+import { broadcastSos } from '../../../ai/sosBroadcast';
 import { getAuth, getRequestsCollection, getNotificationsCollection, getUsersCollection, addDoc, getDocs, query, orderBy, limit, where, onSnapshot, serverTimestamp } from '../../../config/firebase';
 import { useNavigation } from '@react-navigation/native';
 import { useUser } from '../../../context/UserContext';
@@ -124,7 +125,7 @@ const HomeScreen = () => {
 
     setSending(true);
     try {
-      await addDoc(getRequestsCollection(), {
+      const sosRef = await addDoc(getRequestsCollection(), {
         uid: user.uid,
         name: requesterName,
         initials,
@@ -134,36 +135,27 @@ const HomeScreen = () => {
         unitsNeeded: units,
         priority: sosForm.priority,
         status: 'open',
+        responders: [],
         createdAt: serverTimestamp(),
       });
 
-      Toast.show({ type: 'success', text1: 'SOS Sent', text2: 'Urgent request posted.' });
       setSosModalVisible(false);
+      const sent = { ...sosForm };
       setSosForm(prev => ({ ...prev, bloodType: '', location: '', hospital: '', unitsNeeded: '', priority: 'moderate' }));
 
-      // ── Send in-app notification to all other users ─────────────────────
+      // ── Notify compatible donors, ranked by the AI donor-response model ──
       try {
-        const usersSnap = await getDocs(getUsersCollection());
-        const batchPromises: Promise<any>[] = [];
-        usersSnap.docs.forEach((userDoc: any) => {
-          const userData = userDoc.data() as any;
-          if (userData.uid && userData.uid !== user.uid) {
-            batchPromises.push(
-              addDoc(getNotificationsCollection(userData.uid), {
-                type: 'sos',
-                title: '🚨 Urgent Blood Request',
-                body: `${requesterName} needs ${sosForm.bloodType} blood at ${sosForm.location}. ${units} units required.`,
-                fromUserId: user.uid,
-                fromUserName: requesterName,
-                isRead: false,
-                createdAt: serverTimestamp(),
-              }),
-            );
-          }
+        const ranked = await broadcastSos({
+          id: sosRef.id, uid: user.uid, name: requesterName, bloodType: sent.bloodType,
+          hospital: sent.hospital.trim(), location: sent.location.trim(), unitsNeeded: units, priority: sent.priority,
         });
-        await Promise.allSettled(batchPromises);
+        Toast.show({
+          type: 'success', text1: 'SOS Sent',
+          text2: ranked.length ? `${ranked.length} compatible donor(s) notified · AI top match: ${ranked[0].name} (${Math.round(ranked[0].p * 100)}%)` : 'Urgent request posted.',
+        });
       } catch (notifError) {
         console.log('[HomeScreen] SOS notify error:', notifError);
+        Toast.show({ type: 'success', text1: 'SOS Sent', text2: 'Urgent request posted.' });
       }
     } catch (e: any) {
       console.log('SOS create error:', e);

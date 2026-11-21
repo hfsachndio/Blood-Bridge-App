@@ -16,6 +16,7 @@ interface Donor {
   hospital?: string;
   note?: string;
   distance?: string;
+  aiScore?: number;
   lastDonation: string;
   verified: boolean;
   available: boolean;
@@ -57,6 +58,12 @@ const DonorCard = ({ donor, isUnmaskRequested, onRequestUnmask, onMessagePress, 
 
           {!!donor.hospital && (
             <Text style={styles.hospitalText}>🏥 {donor.hospital}</Text>
+          )}
+
+          {typeof donor.aiScore === 'number' && (
+            <Text style={styles.aiText} accessibilityLabel={`AI estimates a ${Math.round(donor.aiScore * 100)} percent chance this donor responds`}>
+              🤖 AI {Math.round(donor.aiScore * 100)}% likely to respond
+            </Text>
           )}
 
           {!!donor.distance && (
