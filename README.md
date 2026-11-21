@@ -7,14 +7,15 @@ This repository is my copy of the team's app. My additions are **BloodBot**, an 
 **Try the app in your browser:** https://blood-bridge-app-nine.vercel.app (same React Native code via react-native-web)
 **Website version:** https://blood-bridge-opal.vercel.app ([source](https://github.com/hfsachndio/blood-bridge-web))
 
-| Demo account | Email | Password |
-|---|---|---|
-| Donor | `ahmed@bloodbridge.demo` | `Demo#1234` |
-| Admin | `admin@bloodbridge.demo` | `Admin#1234` |
-
 **One backend for both:** the app and the website use the same Firebase project (`blood-bridge-78f97`): same logins, same Firestore collections, same security rules (`firestore.rules`). An SOS sent from the app appears on the website live, and the other way round.
 
 > **Credits:** the original app was built as a team project, and I was one of the contributors. The first commit in this repository is the team's original source. Every commit after it, including the NLP assistant, is my own work.
+
+![Blood Bridge app — AI features](docs/media/BloodBridgeApp-overview.jpg)
+
+**Videos:** [mobile app](docs/media/BloodBridgeApp-demo.mp4) · [website](docs/media/BloodBridgeWeb-demo.mp4) · [app + website together](docs/media/BloodBridge-app-and-web.mp4)
+
+![Blood Bridge app and website](docs/media/BloodBridge-app-and-web.jpg)
 
 ![Blood Bridge screens](docs/real-screens.jpg)
 
