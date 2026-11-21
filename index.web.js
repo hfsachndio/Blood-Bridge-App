@@ -1,6 +1,12 @@
 // Web entry (react-native-web build deployed on Vercel). Phones use index.js.
 import { Alert, AppRegistry, Dimensions } from 'react-native';
 import appJson from './app.json';
+import { inject } from '@vercel/analytics';
+import { injectSpeedInsights } from '@vercel/speed-insights';
+
+// Vercel Web Analytics and Speed Insights (free tier, cookie-free; only active on Vercel).
+inject();
+injectSpeedInsights();
 
 // On wide screens the app runs inside a 400px phone frame (see web/index.html), so screen-size
 // based scaling must use the frame's size, not the browser window's.
