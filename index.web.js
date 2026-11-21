@@ -13,7 +13,7 @@ injectSpeedInsights();
 const realGet = Dimensions.get.bind(Dimensions);
 Dimensions.get = (dim) => {
   const d = realGet(dim);
-  if (typeof window === 'undefined' || window.innerWidth < 700) return d;
+  if (typeof window === 'undefined' || window.innerWidth < 480) return d;
   return { ...d, width: 400, height: Math.min(860, window.innerHeight - 48) };
 };
 

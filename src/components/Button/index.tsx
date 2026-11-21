@@ -39,7 +39,9 @@ export default Button;
 
 const styles = StyleSheet.create({
   button: {
-    height: verticalScale(46),
+    // minHeight (not a fixed height) so the label never spills out on short screens
+    minHeight: Math.max(verticalScale(46), 44),
+    paddingVertical: verticalScale(6),
     borderRadius: scale(10),
     alignItems: 'center',
     justifyContent: 'center',

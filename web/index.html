@@ -25,14 +25,14 @@
       html, body { height: 100%; margin: 0; background: #f8fafc; }
       #root { display: flex; height: 100%; }
       /* On wide screens show the app in a phone-sized frame. */
-      @media (min-width: 700px) {
+      @media (min-width: 480px) {
         body { background: radial-gradient(circle at 30% 20%, #fee2e2, #f8fafc 55%); }
         #root { width: 400px; height: min(860px, calc(100% - 48px)); margin: 24px auto; border-radius: 40px; overflow: hidden;
           box-shadow: 0 30px 80px rgba(127, 29, 29, .25), 0 0 0 10px #111827; transform: translateZ(0); }
         .note { position: fixed; left: 24px; bottom: 20px; font: 13px/1.5 system-ui, sans-serif; color: #475569; max-width: 280px; }
         .note a { color: #b91c1c; }
       }
-      @media (max-width: 699px) { .note { display: none; } }
+      @media (max-width: 899px) { .note { display: none; } }
     </style>
   </head>
   <body>
