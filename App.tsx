@@ -9,6 +9,18 @@ import { UserProvider } from './src/context/UserContext';
 
 export const navigationRef = createNavigationContainerRef();
 
+// Web build: show a readable tab title ("Urgent Requests · Blood Bridge App") instead of route ids.
+const APP_TITLE = 'Blood Bridge App';
+const HIDDEN_TITLES = ['SplashScreen', 'OnboardingScreen', 'BottomTabs', 'HomeScreen'];
+const documentTitle = {
+  formatter: (_options: unknown, route?: { name?: string }) => {
+    const name = route?.name;
+    if (!name || HIDDEN_TITLES.includes(name)) return APP_TITLE;
+    const label = name.replace(/Screen$/, '').replace(/([a-z])([A-Z])/g, '$1 $2');
+    return `${label} · ${APP_TITLE}`;
+  },
+};
+
 const App = () => {
   useEffect(() => {
     const messagingInstance = getMessaging(getApp());
@@ -58,7 +70,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <UserProvider>
-        <NavigationContainer ref={navigationRef}>
+        <NavigationContainer ref={navigationRef} documentTitle={documentTitle}>
           <StackNavigator />
         </NavigationContainer>
       </UserProvider>

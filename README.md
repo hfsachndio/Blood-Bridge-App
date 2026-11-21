@@ -77,7 +77,7 @@ npm run typecheck
 
 ## Web build (Vercel)
 
-`npm run build:web` bundles the app with webpack + react-native-web (`webpack.config.js`). Phone-only modules get small web versions in `web/shims`: OpenStreetMap (Leaflet) for react-native-maps, a file picker for the image picker, the browser date picker, browser geolocation, and the Firebase JS SDK (`src/config/firebase.web.ts`) instead of React Native Firebase. Push notifications stay phone-only; the in-app notification feed works everywhere. On a desktop the app is shown inside a phone frame. `npm run web` starts a dev server.
+`npm run build:web` bundles the app with webpack + react-native-web (`webpack.config.js`). Phone-only modules get small web versions in `web/shims`: OpenStreetMap (Leaflet) for react-native-maps, a file picker for the image picker, the browser date picker, browser geolocation, and the Firebase JS SDK (`src/config/firebase.web.ts`) instead of React Native Firebase. Push notifications stay phone-only; the in-app notification feed works everywhere. On a desktop the app is shown inside a phone frame, and the browser tab shows the current screen's name. Vercel Web Analytics and Speed Insights (free tier, cookie-free) run on the web build only. `npm run web` starts a dev server.
 
 ## Running the app
 

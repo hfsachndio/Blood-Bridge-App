@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, StatusBar, ScrollView } from 'react-native';
 import { images } from '../../assets/png/images';
 import { COLORS } from '../../utils/color';
 import { scale, verticalScale } from '../../utils/globalFunction';
@@ -60,7 +60,8 @@ const OnboardingScreen = ({ navigation }: any) => {
         </TouchableOpacity>
       )}
 
-      <View style={styles.content}>
+      {/* Scrolls on very short screens so the text never slides under the buttons. */}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View
           style={[
             styles.imageContainer,
@@ -92,7 +93,7 @@ const OnboardingScreen = ({ navigation }: any) => {
             />
           ))}
         </View>
-      </View>
+      </ScrollView>
 
       <View style={styles.bottom}>
         <Button
@@ -131,8 +132,11 @@ const styles = StyleSheet.create({
     color: COLORS.slate500,
     fontSize: scale(16),
   },
-  content: {
+  scroll: {
     flex: 1,
+  },
+  content: {
+    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingBottom: verticalScale(40),
@@ -144,7 +148,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: scale(100),
-    height: verticalScale(100),
+    height: scale(100),
   },
   title: {
     color: COLORS.gray900,
