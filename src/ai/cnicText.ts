@@ -36,7 +36,7 @@ export function parseCnicText(text: string) {
 
 /** Brightness and contrast (mean / std of luminance) and sharpness (variance of the 4-neighbour Laplacian). */
 export function measureQuality(g: ArrayLike<number>, w: number, h: number): Quality {
-  let sum = 0; for (let i = 0; i < g.length; i++) sum += g[i]; const mean = sum / g.length;
+  let sum = 0, clipped = 0; for (let i = 0; i < g.length; i++) { sum += g[i]; if (g[i] >= 250) clipped++; } const mean = sum / g.length;
   let sq = 0; for (let i = 0; i < g.length; i++) sq += (g[i] - mean) ** 2; const std = Math.sqrt(sq / g.length);
   let ls = 0, ls2 = 0, n = 0;
   for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
@@ -46,7 +46,8 @@ export function measureQuality(g: ArrayLike<number>, w: number, h: number): Qual
   const sharpness = n ? ls2 / n - (ls / n) ** 2 : 0;
   const issues: string[] = [];
   if (mean < 60) issues.push('Photo is too dark');
-  if (mean > 215) issues.push('Photo is overexposed');
+  // A pale green card is bright but fine; overexposure means glare: a large share of pure-white pixels.
+  if (clipped / g.length > 0.3 || mean > 245) issues.push('Photo is overexposed');
   if (std < 25) issues.push('Low contrast');
   if (sharpness < 60) issues.push('Photo looks blurry');
   return { brightness: Math.round(mean), contrast: Math.round(std), sharpness: Math.round(sharpness), ok: issues.length === 0, issues };

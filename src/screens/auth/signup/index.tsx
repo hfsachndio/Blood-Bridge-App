@@ -351,7 +351,8 @@ const SignupScreen = ({ navigation }: any) => {
           />
         </View>
 
-        <View style={styles.rowContainer}>
+        {/* Raised above the fields below so the blood type list can be tapped. */}
+        <View style={[styles.rowContainer, styles.raised]}>
           <View style={[styles.inputGroup, { flex: 1, marginRight: scale(8) }]}>
             <Text style={styles.label}>Blood Type</Text>
             <InputField
@@ -361,6 +362,7 @@ const SignupScreen = ({ navigation }: any) => {
               leftIcon={images.dropleticon}
               rightIcon={images.downarrow}
               onRightIconPress={() => setShowBloodTypes(!showBloodTypes)}
+              onPress={() => setShowBloodTypes(!showBloodTypes)}
             />
 
             {showBloodTypes && (
@@ -382,14 +384,13 @@ const SignupScreen = ({ navigation }: any) => {
 
           <View style={[styles.inputGroup, { flex: 1, marginLeft: scale(8) }]}>
             <Text style={styles.label}>Date of Birth</Text>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-              <InputField
-                placeholder="mm/dd/yyyy"
-                value={formData.dateOfBirth}
-                onChangeText={() => { }}
-                leftIcon={images.calendericon}
-              />
-            </TouchableOpacity>
+            <InputField
+              placeholder="mm/dd/yyyy"
+              value={formData.dateOfBirth}
+              onChangeText={() => { }}
+              leftIcon={images.calendericon}
+              onPress={() => setShowDatePicker(true)}
+            />
           </View>
         </View>
 
@@ -540,6 +541,10 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  raised: {
+    zIndex: 20,
+    elevation: 20,
   },
   dropdown: {
     position: 'absolute',

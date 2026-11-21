@@ -40,4 +40,11 @@ describe('CNIC reader', () => {
     expect(measureQuality(sharp, w, h).ok).toBe(true);
     expect(qualityFromText('ab').ok).toBe(false);
   });
+  it('accepts a bright, pale card but flags glare', () => {
+    const w = 60, h = 60;
+    const pale = Float32Array.from({ length: w * h }, (_, i) => (i % 10 === 0 ? 40 : 242)); // light green card with dark text
+    expect(measureQuality(pale, w, h).issues).not.toContain('Photo is overexposed');
+    const glare = Float32Array.from({ length: w * h }, (_, i) => (i % 2 ? 255 : (i % 10 === 0 ? 40 : 200)));
+    expect(measureQuality(glare, w, h).issues).toContain('Photo is overexposed');
+  });
 });

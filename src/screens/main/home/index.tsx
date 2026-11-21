@@ -223,6 +223,7 @@ share them with a patient.`}
             leftIcon={images.dropleticon}
             rightIcon={images.downarrow}
             onRightIconPress={() => setShowBloodTypes(!showBloodTypes)}
+            onPress={() => setShowBloodTypes(!showBloodTypes)}
           />
           {showBloodTypes && (
             <View style={styles.dropdown}>

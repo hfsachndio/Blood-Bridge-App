@@ -13,10 +13,13 @@ const InputField = ({
   onRightIconPress,
   secure = false,
   style,
-  inputStyle
+  inputStyle,
+  onPress,
 }: any) => {
+  // With onPress the field is a picker trigger: the whole box is tappable and typing is off.
+  const Wrapper: any = onPress ? TouchableOpacity : View;
   return (
-    <View style={[styles.wrapper, style]}>
+    <Wrapper style={[styles.wrapper, style]} {...(onPress ? { onPress, activeOpacity: 0.7, accessibilityRole: 'button' } : {})}>
       
       {leftIcon && (
         <Image 
@@ -34,6 +37,8 @@ const InputField = ({
         style={[styles.input, inputStyle]}
         secureTextEntry={secure}
         placeholderTextColor={COLORS.gray300}
+        editable={!onPress}
+        pointerEvents={onPress ? 'none' : 'auto'}
       />
 
       {rightIcon && (
@@ -47,7 +52,7 @@ const InputField = ({
         </TouchableOpacity>
       )}
 
-    </View>
+    </Wrapper>
   );
 };
 
